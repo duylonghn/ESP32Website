@@ -33,16 +33,20 @@ void WebSerialMonitor::cmdFromWeb(WebSerialCommandCallback cb) {
   _cmdCallback = cb;
 }
 
+void WebSerialMonitor::println(int value) {
+  ws.textAll(String(value));
+} 
+
 void WebSerialMonitor::println(const String& msg) {
-  ws.textAll(msg);
+  ws.textAll(msg + "\n"); // Thêm ký tự xuống dòng
 }
 
 void WebSerialMonitor::println(const char* msg) {
-  ws.textAll(String(msg));
+  ws.textAll(String(msg) + "\n"); // Chuyển sang String và thêm \n
 }
 
 void WebSerialMonitor::printRaw(const char* msg) {
-  ws.textAll(msg);
+  ws.textAll(msg); // Không thay đổi, gửi trực tiếp
 }
 
 void WebSerialMonitor::handleEvent(AsyncWebSocket* server, AsyncWebSocketClient* client,

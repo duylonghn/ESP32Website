@@ -1,15 +1,13 @@
-# 📡 ESP32Website V1.1.0
+# 📡 ESP32Website V1.1.1
 
 **ESP32Website** là một thư viện hỗ trợ xây dựng giao diện web cho ESP32, bao gồm các chức năng xem log, gửi lệnh thời gian thực qua WebSocket, và truy cập/đọc dữ liệu từ thẻ SD. Dễ dàng tích hợp và mở rộng cho các dự án IOT, debug, giám sát thiết bị...
 
 ## 🔧 Tool chuyển định dạng html sang gzip
 - Làm giảm dung lượng giao diện web nạp vào thiết bị
-- Để sử dụng bạn cần cài đặt `Python` về máy
-- Mở `command line` tại thư mục chứa tool
-- Sử dụng câu lệnh `python convert.py mode file1 file2`
-- Với mode `to_array` để chuyển từ `.html` sang `.h`, `to_html` chuyển từ `.h` sang `.html`
-- Tên file cần nhập tên và đuôi định dạng ví dụ ` python convert.py to_array file1.html file1.h`
-- Nếu bạn muốn chuyển từ `.h` sang `.html` hãy chỉ để dãy số trong file `.h`
+- Chạy file [convert.exe](https://github.com/duylonghn/ESP32Website/blob/main/WebUI/)
+- Khi phần mềm được chạy hãy nhập chế độ gồm có `to_array` để chuyển từ `.html` sang `.h` và `to_html` là ngược lại
+- Nhập tên file muốn chuyển
+- Nhập tên file muốn đặt sau khi chuyển
 
 ## 📁 Thư viện con
 

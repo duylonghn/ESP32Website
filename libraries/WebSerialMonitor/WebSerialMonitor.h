@@ -10,6 +10,7 @@ class WebSerialMonitor {
   public:
     WebSerialMonitor(AsyncWebServer* server);
     void begin();
+    void println(int value);
     void println(const String& msg);
     void println(const char* msg);
     void printRaw(const char* msg);
