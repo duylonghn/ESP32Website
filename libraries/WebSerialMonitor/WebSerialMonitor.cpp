@@ -5,8 +5,15 @@ WebSerialMonitor::WebSerialMonitor(AsyncWebServer* server)
   : ws("/"), _server(server) {}
 
 void WebSerialMonitor::begin() {
-  _server->on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+
+  /*_server->on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send_P(200, "text/html", webserial);
+  });//*/
+
+  _server->on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+    AsyncWebServerResponse *response = request->beginResponse_P(200, "text/html", webserial, sizeof(webserial));
+    response->addHeader("Content-Encoding", "gzip");
+    request->send(response);
   });
 
   ws.onEvent([this](AsyncWebSocket* server,

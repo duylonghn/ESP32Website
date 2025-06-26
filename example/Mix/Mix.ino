@@ -1,11 +1,13 @@
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
+#include <AsyncTCP.h>
 #include <SD.h>
+#include <ElegantOTA.h>
 #include "WebSerialMonitor.h"
 #include "WebReadSDCard.h"
 
-const char* ssid = "SSID";
-const char* password = "PASS";
+const char* ssid = "Duy Long";
+const char* password = "Khong@biet";
 
 #define SD_CS 5
 #define SD_SCK 18
@@ -13,9 +15,11 @@ const char* password = "PASS";
 #define SD_MOSI 23
 SPIClass spiSD(VSPI);
 
+#define FW_VERSION "1.0.0"
+
 AsyncWebServer server(80);
 WebSerialMonitor webSerial(&server);
-WebReadSDCard webSD(&server);
+WebReadSDCard webSD(&server, FW_VERSION);
 
 void setup() {
   Serial.begin(115200);
@@ -47,8 +51,10 @@ void setup() {
   
   // Bắt đầu server
   server.begin();
+  ElegantOTA.begin(&server);
   webSerial.println("✅ Server đã khởi động");
 }
 
 void loop() {
+  ElegantOTA.loop();
 }

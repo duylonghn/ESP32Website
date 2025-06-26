@@ -11,6 +11,29 @@ String WebReadSDCard::formatSize(uint64_t bytes) {
   return String(bytes) + " B";
 }
 
+String urlDecode(const String& input) {
+  String decoded = "";
+  char temp[] = "0x00";
+  unsigned int len = input.length();
+  unsigned int i = 0;
+
+  while (i < len) {
+    char c = input.charAt(i);
+    if (c == '+') {
+      decoded += ' ';
+    } else if (c == '%' && i + 2 < len) {
+      temp[2] = input.charAt(i + 1);
+      temp[3] = input.charAt(i + 2);
+      decoded += (char) strtol(temp, NULL, 16);
+      i += 2;
+    } else {
+      decoded += c;
+    }
+    i++;
+  }
+  return decoded;
+}
+
 void WebReadSDCard::begin() {
   handleRoot();
   handleSystemInfo();
@@ -19,15 +42,22 @@ void WebReadSDCard::begin() {
   handleFileAction();
   handleRename();
   handleReboot();
-  handleOTA();
 
   _server->begin();
   Serial.println("✅ Truy cập: http://" + WiFi.localIP().toString() + "/readsd để vào WebReadSDCard");
 }
 
-void WebReadSDCard::handleRoot() {
+/*void WebReadSDCard::handleRoot() {
   _server->on("/readsd", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send_P(200, "text/html", readsdcard);
+  });
+}//*/
+
+void WebReadSDCard::handleRoot() {
+  _server->on("/readsd", HTTP_GET, [](AsyncWebServerRequest *request) {
+    AsyncWebServerResponse *response = request->beginResponse_P(200, "text/html", readsdcard, sizeof(readsdcard));
+    response->addHeader("Content-Encoding", "gzip");
+    request->send(response);
   });
 }
 
@@ -48,13 +78,13 @@ void WebReadSDCard::handleSystemInfo() {
 }
 
 void WebReadSDCard::handleListFiles() {
-  _server->on("/listfiles", HTTP_GET, [](AsyncWebServerRequest *request) {
+  _server->on("/listfiles", HTTP_GET, [this](AsyncWebServerRequest *request) {
     if (!request->hasParam("folder")) {
       request->send(400, "text/plain", "Missing 'folder' parameter");
       return;
     }
 
-    String folder = request->getParam("folder")->value();
+    String folder = urlDecode(request->getParam("folder")->value());
     if (!folder.startsWith("/")) folder = "/" + folder;
 
     File dir = SD.open(folder);
@@ -73,7 +103,7 @@ void WebReadSDCard::handleListFiles() {
       if (fileName.length() > 0) {
         output += (file.isDirectory() ? "Fo " : "Fi ") + fileName;
         if (!file.isDirectory()) {
-          output += ": " + String(file.size());
+          output += ": " + formatSize(file.size());
         }
         output += "\n";
       }
@@ -94,7 +124,7 @@ void WebReadSDCard::handleUpload() {
 
     if (index == 0) {
       if (request->hasParam("folder", true)) {
-        folder = request->getParam("folder", true)->value();
+        folder = urlDecode(request->getParam("folder", true)->value());
         if (!folder.startsWith("/")) folder = "/" + folder;
         if (!SD.exists(folder)) SD.mkdir(folder);
       }
@@ -113,7 +143,7 @@ void WebReadSDCard::handleFileAction() {
       return;
     }
 
-    String name = request->getParam("name")->value();
+    String name = urlDecode(request->getParam("name")->value());
     if (!name.startsWith("/")) name = "/" + name;
     String action = request->getParam("action")->value();
 
@@ -165,16 +195,29 @@ void WebReadSDCard::handleRename() {
 
     String oldPath = request->getParam("filePath", true)->value();
     String newName = request->getParam("fileName", true)->value();
-    if (!oldPath.startsWith("/")) oldPath = "/" + oldPath;
-    String newPath = oldPath.substring(0, oldPath.lastIndexOf("/")) + "/" + newName;
 
-    if (SD.rename(oldPath, newPath)) {
-      request->send(200, "text/plain", "Renamed successfully");
+    if (!oldPath.startsWith("/")) oldPath = "/" + oldPath;
+
+    int slashIndex = oldPath.lastIndexOf('/');
+    if (slashIndex == -1) {
+      request->send(400, "text/plain", "Invalid path");
+      return;
+    }
+
+    String newPath = oldPath.substring(0, slashIndex + 1) + newName;
+
+    if (SD.exists(oldPath)) {
+      if (SD.rename(oldPath, newPath)) {
+        request->send(200, "text/plain", "Renamed successfully");
+      } else {
+        request->send(500, "text/plain", "Rename failed");
+      }
     } else {
-      request->send(500, "text/plain", "Rename failed");
+      request->send(404, "text/plain", "File not found: " + oldPath);
     }
   });
 }
+
 
 void WebReadSDCard::handleReboot() {
   _server->on("/reboot", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -182,31 +225,4 @@ void WebReadSDCard::handleReboot() {
     delay(500);
     ESP.restart();
   });
-}
-
-void WebReadSDCard::handleOTA() {
-  _server->on("/OTA", HTTP_POST, [](AsyncWebServerRequest *request) {
-    request->send(200, "text/plain", "OK");
-  });
-
-  _server->on("/OTAFILE", HTTP_POST, [](AsyncWebServerRequest *request) {},
-    [](AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data,
-       size_t len, bool final) {
-      static bool updateStarted = false;
-      if (index == 0) {
-        updateStarted = Update.begin(UPDATE_SIZE_UNKNOWN);
-      }
-      if (updateStarted) {
-        Update.write(data, len);
-        if (final) {
-          if (Update.end(true)) {
-            request->send(200, "text/plain", "OTA Success. Rebooting...");
-            delay(1000);
-            ESP.restart();
-          } else {
-            request->send(500, "text/plain", "OTA Failed");
-          }
-        }
-      }
-    });
 }

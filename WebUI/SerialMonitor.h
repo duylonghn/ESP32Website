@@ -1,7 +1,4 @@
-#ifndef SERIALMONITOR_H
-#define SERIALMONITOR_H
-
-const uint8_t webserial[1227] PROGMEM = {
+const uint8_t HTML[] PROGMEM = {
   31, 139, 8, 0, 197, 24, 92, 104, 2, 255, 173, 87, 221, 110, 220, 68, 20, 190, 71, 226, 
   29, 78, 93, 42, 237, 138, 120, 127, 210, 4, 90, 103, 119, 69, 155, 6, 165, 82, 162, 84, 
   77, 16, 66, 8, 169, 179, 246, 172, 61, 100, 60, 99, 121, 102, 119, 179, 84, 251, 6, 92, 
@@ -65,8 +62,4 @@ const uint8_t webserial[1227] PROGMEM = {
   242, 98, 202, 153, 227, 168, 205, 71, 131, 121, 200, 166, 44, 14, 82, 243, 15, 214, 191, 153, 
   141, 243, 33, 112, 13, 0, 0
 };
-
-/*const char webserial[] PROGMEM = R"rawliteral(
-
-)rawliteral";//*/
-#endif
+const uint32_t HTML_SIZE = 1227;

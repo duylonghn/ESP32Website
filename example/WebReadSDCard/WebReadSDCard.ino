@@ -6,8 +6,8 @@
 
 #include "WebReadSDCard.h"
 
-const char* ssid = "SSID";
-const char* password = "PASS";
+const char* ssid = "REPLACE_WITH_YOUR_SSID";
+const char* password = "REPLACE_WITH_YOUR_PASS";
 
 #define FW_VERSION "1.0.0" // Phiên bản của firmware
 

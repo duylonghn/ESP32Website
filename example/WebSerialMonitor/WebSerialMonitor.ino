@@ -3,8 +3,8 @@
 #include "WebSerialMonitor.h"
 #include "SerialMonitor.h"
 
-const char* ssid = "SSID";
-const char* password = "PASS";
+const char* ssid = "Duy Long";
+const char* password = "Khong@biet";
 
 AsyncWebServer server(80);
 WebSerialMonitor webSerial(&server);

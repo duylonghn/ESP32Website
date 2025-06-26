@@ -25,7 +25,6 @@ class WebReadSDCard {
     void handleFileAction();
     void handleRename();
     void handleReboot();
-    void handleOTA();
 };
 
 #endif

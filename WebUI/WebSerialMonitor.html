@@ -109,7 +109,7 @@
   const logDiv = document.getElementById("log");
   const input = document.getElementById("commandInput");
 
-  const socket = new WebSocket(`ws://${window.location.hostname}/webserial`);
+  const socket = new WebSocket(`ws://${window.location.hostname}/`);
 
   socket.onopen = () => {
     addLog("🟢 Đã kết nối tới ESP32 WebSerial");
