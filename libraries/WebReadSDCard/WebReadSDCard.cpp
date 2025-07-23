@@ -54,7 +54,7 @@ void WebReadSDCard::begin() {
 }//*/
 
 void WebReadSDCard::handleRoot() {
-  _server->on("/readsd", HTTP_GET, [](AsyncWebServerRequest *request) {
+  _readsdHandler = &_server->on("/readsd", HTTP_GET, [](AsyncWebServerRequest *request) {
     AsyncWebServerResponse *response = request->beginResponse_P(200, "text/html", readsdcard, sizeof(readsdcard));
     response->addHeader("Content-Encoding", "gzip");
     request->send(response);
@@ -62,7 +62,7 @@ void WebReadSDCard::handleRoot() {
 }
 
 void WebReadSDCard::handleSystemInfo() {
-  _server->on("/systeminfo", HTTP_GET, [this](AsyncWebServerRequest *request) {
+  _systemInfoHandler = &_server->on("/systeminfo", HTTP_GET, [this](AsyncWebServerRequest *request) {
     String json = "{\"VERSION\":\"" + String(_version) + "\",\"SD\":{";
 
     if (SD.begin()) {
@@ -78,7 +78,7 @@ void WebReadSDCard::handleSystemInfo() {
 }
 
 void WebReadSDCard::handleListFiles() {
-  _server->on("/listfiles", HTTP_GET, [this](AsyncWebServerRequest *request) {
+  _listFilesHandler = &_server->on("/listfiles", HTTP_GET, [this](AsyncWebServerRequest *request) {
     if (!request->hasParam("folder")) {
       request->send(400, "text/plain", "Missing 'folder' parameter");
       return;
@@ -115,7 +115,7 @@ void WebReadSDCard::handleListFiles() {
 }
 
 void WebReadSDCard::handleUpload() {
-  _server->on("/upload", HTTP_POST, [](AsyncWebServerRequest *request) {
+  _uploadHandler = &_server->on("/upload", HTTP_POST, [](AsyncWebServerRequest *request) {
     request->send(200, "text/plain", "OK");
   }, [](AsyncWebServerRequest *request, String filename, size_t index,
         uint8_t *data, size_t len, bool final) {
@@ -137,7 +137,7 @@ void WebReadSDCard::handleUpload() {
 }
 
 void WebReadSDCard::handleFileAction() {
-  _server->on("/file", HTTP_GET, [](AsyncWebServerRequest *request) {
+  _fileHandler = &_server->on("/file", HTTP_GET, [](AsyncWebServerRequest *request) {
     if (!request->hasParam("name") || !request->hasParam("action")) {
       request->send(400, "text/plain", "Missing parameters");
       return;
@@ -187,7 +187,7 @@ void WebReadSDCard::handleFileAction() {
 }
 
 void WebReadSDCard::handleRename() {
-  _server->on("/rename", HTTP_POST, [](AsyncWebServerRequest *request) {
+  _renameHandler = &_server->on("/rename", HTTP_POST, [](AsyncWebServerRequest *request) {
     if (!request->hasParam("filePath", true) || !request->hasParam("fileName", true)) {
       request->send(400, "text/plain", "Missing parameters");
       return;
@@ -220,9 +220,19 @@ void WebReadSDCard::handleRename() {
 
 
 void WebReadSDCard::handleReboot() {
-  _server->on("/reboot", HTTP_GET, [](AsyncWebServerRequest *request) {
+  _rebootHandler = &_server->on("/reboot", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send(200, "text/plain", "Rebooting...");
     delay(500);
     ESP.restart();
   });
+}
+
+void WebReadSDCard::end() {
+  if (_readsdHandler)       _server->removeHandler(_readsdHandler);
+  if (_systemInfoHandler)   _server->removeHandler(_systemInfoHandler);
+  if (_listFilesHandler)    _server->removeHandler(_listFilesHandler);
+  if (_uploadHandler)       _server->removeHandler(_uploadHandler);
+  if (_fileHandler)         _server->removeHandler(_fileHandler);
+  if (_renameHandler)       _server->removeHandler(_renameHandler);
+  if (_rebootHandler)       _server->removeHandler(_rebootHandler);
 }

@@ -12,10 +12,19 @@ class WebReadSDCard {
   public:
     WebReadSDCard(AsyncWebServer* server, const char* version);
     void begin();
+    void end();
 
   private:
     AsyncWebServer* _server;
     const char* _version;
+
+    AsyncCallbackWebHandler* _readsdHandler = nullptr;
+    AsyncCallbackWebHandler* _systemInfoHandler = nullptr;
+    AsyncCallbackWebHandler* _listFilesHandler = nullptr;
+    AsyncCallbackWebHandler* _uploadHandler = nullptr;
+    AsyncCallbackWebHandler* _fileHandler = nullptr;
+    AsyncCallbackWebHandler* _renameHandler = nullptr;
+    AsyncCallbackWebHandler* _rebootHandler = nullptr;
 
     String formatSize(uint64_t bytes);
     void handleRoot();

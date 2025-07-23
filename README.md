@@ -1,4 +1,4 @@
-# 📡 ESP32Website V1.1.1
+# 📡 ESP32Website V1.1.2
 
 **ESP32Website** là một thư viện hỗ trợ xây dựng giao diện web cho ESP32, bao gồm các chức năng xem log, gửi lệnh thời gian thực qua WebSocket, và truy cập/đọc dữ liệu từ thẻ SD. Dễ dàng tích hợp và mở rộng cho các dự án IOT, debug, giám sát thiết bị...
 
@@ -19,10 +19,11 @@
 - Hỗ trợ lệnh khởi động lại, bật/tắt thiết bị,...
 - Theo dõi log Serial Monitor không cần kết nối cáp dữ liệu/
 
-### 2. `WebReadSDCard 1.0.1`
+### 2. `WebReadSDCard 1.0.2`
 > Thao tác với thẻ SD Card
 - Xem thông tin thẻ nhớ: Dung lượng tổng, dung lượng đã sử dụng, dung lượng còn lại/
 - Thao tác: Xóa, Thêm, Đổi tên file trên thẻ nhớ/
+- Hàm dừng server
 
 ### 3. `ElegentOTA`
 > Nạp firmware qua OTA
